@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'questions.dart';
+import 'dart:math';
 
 void main() => runApp(Quizzler());
 
@@ -25,6 +28,39 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
+  List<Icon> iconList = [];
+
+  int questionNumber = 0;
+  int totalQuestion = 13;
+  int correct = 0;
+
+  void changeQuestionNumber() {
+    if (questionNumber + 1 < ques.length) questionNumber++;
+  }
+
+  void addIcon(bool choice) {
+    bool correctAnswer = ques[questionNumber].a;
+    if (choice == correctAnswer) {
+      iconList.add(
+        Icon(
+          Icons.check,
+          color: Colors.green,
+        ),
+      );
+      correct++;
+    }
+
+    if (choice != correctAnswer)
+      iconList.add(
+        Icon(
+          Icons.cancel,
+          color: Colors.red,
+        ),
+      );
+  }
+
+  bool flag = true;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -37,7 +73,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                'This is where the question text will go.',
+                ques[questionNumber].q,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25.0,
@@ -62,6 +98,19 @@ class _QuizPageState extends State<QuizPage> {
               ),
               onPressed: () {
                 //The user picked true.
+                if (questionNumber + 1 >= ques.length) {
+                  Alert(
+                          context: context,
+                          title: "Quiz End",
+                          desc:
+                              "You have answered all questions and your score is ${((correct / totalQuestion) * 100).round()} %")
+                      .show();
+                } else {
+                  setState(() {
+                    addIcon(true);
+                    changeQuestionNumber();
+                  });
+                }
               },
             ),
           ),
@@ -79,12 +128,26 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                //The user picked false.
+                if (questionNumber + 1 >= ques.length) {
+                  Alert(
+                          context: context,
+                          title: "Quiz End",
+                          desc:
+                              "You have answered all questions and your score is ${((correct / totalQuestion) * 100).round()} %")
+                      .show();
+                } else {
+                  setState(() {
+                    addIcon(false);
+                    changeQuestionNumber();
+                  });
+                }
               },
             ),
           ),
         ),
-        //TODO: Add a Row here as your score keeper
+        Row(
+          children: iconList,
+        ),
       ],
     );
   }
